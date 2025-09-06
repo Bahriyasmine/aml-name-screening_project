@@ -1,0 +1,161 @@
+{
+  "name": "n8nAML",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "aml/alert",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -528,
+        -16
+      ],
+      "id": "5fe9ec28-3d7c-467a-bb9e-bd5d28ddefd5",
+      "name": "Webhook",
+      "webhookId": "fadb578a-23b4-4004-b3ad-417248d8c87e"
+    },
+    {
+      "parameters": {
+        "fromEmail": "yasminebahri240@gmail.com",
+        "toEmail": "yasminebahri240@gmail.com",
+        "subject": "=AML Alert: {{$json.decision}} - {{$json.input}}",
+        "html": "=<h2>AML Alert</h2>\n<p>Input: {{ $node[\"Webhook\"].json[\"body\"][\"input\"] }}</p>\n<p>Decision: {{ $node[\"Webhook\"].json[\"body\"][\"decision\"] }}</p>\n<p>Similarity: {{ $node[\"Webhook\"].json[\"body\"][\"similarity\"] }}%</p>\n<p>Reason: {{ $node[\"Webhook\"].json[\"body\"][\"reason\"] }}</p>\n<p>XGB Risk: {{ $node[\"Webhook\"].json[\"body\"][\"xgbRiskPct\"] }}%</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        32,
+        -112
+      ],
+      "id": "61d6362f-ef14-4691-b1ff-87104a223b63",
+      "name": "Send email",
+      "webhookId": "d6f8565c-16c7-4ca4-a63f-4f7c7139e83b",
+      "credentials": {
+        "smtp": {
+          "id": "naTbiuSJvr8QF3vO",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"status\":\"email_sent\",\"decision\":\"{{$json.body?.decision || $json.decision}}\"}\n",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        272,
+        96
+      ],
+      "id": "0c34c8be-5454-4b87-bb20-815e4a228650",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7d99e42a-e851-4934-a9b8-a45e5a416236",
+              "leftValue": "={{$node[\"Webhook\"].json[\"body\"][\"decision\"]}}",
+              "rightValue": "REVIEW",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "8a1299e4-c950-4de8-88e5-f96533a3747c",
+              "leftValue": "={{$node[\"Webhook\"].json[\"body\"][\"decision\"]}}",
+              "rightValue": "BLOCKED",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -320,
+        -16
+      ],
+      "id": "8505d3ca-8f1f-4274-bd4c-4753d45d277c",
+      "name": "If"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3f6df46a-155a-468f-b08a-fa2614c0a025",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "81323c149be202a172d893986cf9065135f9305e56fa8b83515034935dfcaab9"
+  },
+  "id": "qXHH0QNEaMGftbd0",
+  "tags": []
+}
