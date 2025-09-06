@@ -35,6 +35,21 @@ Streamlit UI · XGBoost (primary) · n8n email alerts · Fuzzy name matching
 | Random Forest      | Benchmark  | Strong baseline; OOB score available.                      |
 | Logistic Regression| Benchmark  | Simple linear baseline.                                    |
 
+---
+## Project layout
+
+```text
+.
+├── backend/
+│   ├── model.py                    # AMLNameMatcher: features, training, matching
+│   ├── models/                     # saved artifacts (auto-created)
+│   └── cleaned_aml_data.xlsx       # local dataset (not committed)
+├── front/
+│   └── app.py                      # Streamlit UI (uses AMLNameMatcher)
+└── n8n/
+    └── workflows/
+        └── aml_alert_webhook.json  # exported workflow (optional)
+
 
 
 ---
